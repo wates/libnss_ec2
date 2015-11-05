@@ -2,7 +2,7 @@
 #include "instances.h"
 
 #include <aws/core/client/ClientConfiguration.h>
-#include <aws/core/auth/AWSCredentialsProvider.h>
+#include <aws/core/auth/AWSCredentialsProviderChain.h>
 #include <aws/core/Region.h>
 #include <aws/core/utils/Outcome.h>
 
@@ -23,15 +23,11 @@ namemap* ListInstances(int *len){
     std::vector<namemap> names;
     //const std::shared_ptr<Aws::Utils::Logging::LogSystemInterface> logr(new Aws::Utils::Logging::ConsoleLogSystem(Aws::Utils::Logging::LogLevel::Debug));
     //Aws::Utils::Logging::InitializeAWSLogging(logr);
-
-    Aws::Auth::EnvironmentAWSCredentialsProvider env_cred;
-    //Aws::Auth::AWSCredentials cred(std::getenv("AWS_ACCESS_KEY_ID"),
-    //    std::getenv("AWS_SECRET_ACCESS_KEY"), std::getenv("AWS_SESSION_TOKEN"));
+    Aws::Auth::DefaultAWSCredentialsProviderChain chain;
     Aws::Client::ClientConfiguration config;
     config.region = Aws::Region::AP_NORTHEAST_1;
 
-    //Aws::EC2::EC2Client ec2(cred, config);
-    Aws::EC2::EC2Client ec2(env_cred.GetAWSCredentials(), config);
+    Aws::EC2::EC2Client ec2(chain.GetAWSCredentials(), config);
     Aws::EC2::Model::DescribeInstancesRequest req;
     Aws::EC2::Model::DescribeInstancesOutcome outcome = ec2.DescribeInstances(req);
     if (outcome.IsSuccess()){
